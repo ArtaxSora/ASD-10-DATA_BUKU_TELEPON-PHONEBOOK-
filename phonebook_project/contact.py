@@ -1,4 +1,4 @@
-# TODO
+# TODO menambahkan
 
 class Contact:
     def __init__(self, name: str, phone: str, email: str = "", note: str = ""):
@@ -18,3 +18,4 @@ class Contact:
             "email": self.email,
             "note":  self.note,
         }
+        
