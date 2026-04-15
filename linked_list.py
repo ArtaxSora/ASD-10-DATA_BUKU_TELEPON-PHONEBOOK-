@@ -1,6 +1,6 @@
 # ============================================================
 # linked_list.py
-# Kerjaan nabil & nazmi
+# Hari 2 – Anggota 3
 # Tugas: Sorted Linked List lengkap + Binary & Linear Search
 # ============================================================
 
@@ -155,3 +155,123 @@ class LinkedList:
                 return cur
             cur = cur.next
         return None
+
+    # ── UPDATE ───────────────────────────────────────────────
+    def update(
+        self,
+        name:      str,
+        new_name:  str | None = None,
+        new_phone: str | None = None,
+        
+        new_note:  str | None = None,
+    ) -> tuple[bool, str]:
+        """
+        Update satu atau beberapa field kontak.
+        Jika nama berubah → hapus & sisip ulang untuk jaga urutan.
+        Return (True, pesan_sukses) atau (False, pesan_error).
+        """
+        contact = self.search_by_name(name)
+        if contact is None:
+            return False, f"Kontak '{name}' tidak ditemukan."
+
+        name_changed = new_name and new_name.strip().lower() != name.strip().lower()
+
+        if name_changed:
+            # Periksa apakah nama baru sudah ada
+            if self.search_by_name(new_name):
+                return False, f"Nama '{new_name}' sudah digunakan oleh kontak lain."
+            self.delete(name)
+            contact.name = new_name.strip()
+
+        if new_phone is not None:
+            contact.phone = new_phone.strip()
+        if new_note is not None:
+            contact.note  = new_note.strip()
+
+        if name_changed:
+            self.insert_sorted(contact)
+
+        return True, "Kontak berhasil diperbarui."
+
+    # ── GET DATA ─────────────────────────────────────────────
+    def get_all(self) -> list[Contact]:
+        """Kembalikan semua kontak sebagai list (urutan A-Z)."""
+        result = []
+        cur    = self.head
+        while cur:
+            result.append(cur)
+            cur = cur.next
+        return result
+
+    def get_sorted(self, reverse: bool = False, by: str = "name") -> list[Contact]:
+        """
+        Kembalikan list kontak yang sudah diurutkan.
+        by     : 'name' | 'phone'
+        reverse: False = ascending, True = descending
+        """
+        arr = self.get_all()
+        if by == "phone":
+            arr.sort(key=lambda c: c.phone, reverse=reverse)
+        else:
+            arr.sort(key=lambda c: c.name.lower(), reverse=reverse)
+        return arr
+
+    # ── DISPLAY ─────────────────────────────────────────────
+    def display_all(self) -> None:
+        """Cetak semua kontak dalam format tabel."""
+        self._print_table(self.get_all())
+
+    def _print_table(self, contacts: list[Contact]) -> None:
+        """Cetak list kontak sebagai tabel rata kiri."""
+        if not contacts:
+            print("  [Tidak ada kontak]")
+            return
+
+        W_NO    = 4
+        W_NAME  = 25
+        W_PHONE = 17
+        
+        W_NOTE  = 20
+        total   = W_NO + W_NAME + W_PHONE + W_NOTE + 6
+
+        header  = (
+            f"  {'No':<{W_NO}} {'Nama':<{W_NAME}} "
+            f"{'Telepon':<{W_PHONE}} {'Catatan':<{W_NOTE}}"
+        )
+        print(header)
+        print("  " + "─" * total)
+
+        for i, c in enumerate(contacts, 1):
+            name  = (c.name[:W_NAME-1]  + "…") if len(c.name)  > W_NAME  else c.name
+            phone = (c.phone[:W_PHONE-1] + "…") if len(c.phone) > W_PHONE else c.phone
+            
+            note  = (c.note[:W_NOTE-1]  + "…") if len(c.note)  > W_NOTE  else c.note
+            print(
+                f"  {i:<{W_NO}} {name:<{W_NAME}} "
+                f"{phone:<{W_PHONE}} {note:<{W_NOTE}}"
+            )
+
+
+# ── Unit-test sederhana ─────────────────────────────────────
+if __name__ == "__main__":
+    ll = LinkedList()
+    for name, phone in [("Citra", "081"), ("Ani", "082"), ("Budi", "083"), ("Ani", "999")]:
+        ok = ll.insert_sorted(Contact(name, phone))
+        print(f"  insert '{name}': {'OK' if ok else 'DUPLIKAT'}")
+
+    print("\n  Semua kontak (harus A-Z):")
+    ll.display_all()
+
+    print("\n  Binary Search 'Budi':", ll.search_by_name("Budi"))
+    print("  Linear Search nomor '082':", ll.search_by_phone("082"))
+    print("  Partial 'it':", [c.name for c in ll.search_by_name_partial("it")])
+
+    ll.update("Budi", new_name="Dedi", new_phone="099")
+    print("\n  Setelah update 'Budi' → 'Dedi':")
+    ll.display_all()
+
+    ll.delete("Ani")
+    print("\n  Setelah delete 'Ani':")
+    ll.display_all()
+
+    print("\n✅ linked_list.py OK")
