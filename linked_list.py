@@ -1,6 +1,6 @@
 # ============================================================
 # linked_list.py
-# Hari 2 – Anggota 3
+# Hari 2 – Nazmi
 # Tugas: Sorted Linked List lengkap + Binary & Linear Search
 # ============================================================
 
@@ -22,6 +22,7 @@ class LinkedList:
         search_by_phone→ O(n)      [Linear Search]
         get_all        → O(n)
     """
+    
 
     def __init__(self):
         self.head: Contact | None = None
