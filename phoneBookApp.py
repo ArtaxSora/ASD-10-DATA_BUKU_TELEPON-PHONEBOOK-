@@ -153,18 +153,12 @@ class PhoneBookApp:
             "  Telepon    : ", Validator.validate_phone
         )
 
-        # Email (opsional)
-        email = Validator.prompt_until_valid(
-            "  Email      : ", Validator.validate_email, allow_empty=True
-        )
-
         # Catatan (opsional, bebas)
         note = Validator.sanitize(input("  Catatan    : ").strip())
 
         contact = Contact(
             name  = Validator.sanitize(name),
             phone = phone,
-            email = email,
             note  = note,
         )
         self.phonebook.insert_sorted(contact)
@@ -212,7 +206,7 @@ class PhoneBookApp:
                 suggestions = self.phonebook.search_by_name_partial(keyword)
                 if suggestions:
                     print(f"\n  ℹ️  Tidak ada nama persis. "
-                          f"Ditemukan {len(suggestions)} kontak yang mirip:")
+                        f"Ditemukan {len(suggestions)} kontak yang mirip:")
                     self.phonebook._print_table(suggestions)
                     self._log(f"SEARCH  → nama='{keyword}' ({len(suggestions)} mirip)")
                 else:
@@ -273,15 +267,6 @@ class PhoneBookApp:
                 print(f"  ❌ {result}"); _pause(); return
             new_phone = result
 
-        # ── Email baru ──
-        new_email_raw = input(f"  Email      [{contact.email}]: ").strip()
-        new_email: str | None = None
-        if new_email_raw:
-            ok, result = Validator.validate_email(new_email_raw)
-            if not ok:
-                print(f"  ❌ {result}"); _pause(); return
-            new_email = result
-
         # ── Catatan baru ──
         new_note_raw = input(f"  Catatan    [{contact.note}]: ").strip()
         new_note: str | None = Validator.sanitize(new_note_raw) if new_note_raw else None
@@ -290,7 +275,6 @@ class PhoneBookApp:
             name,
             new_name  = new_name,
             new_phone = new_phone,
-            new_email = new_email,
             new_note  = new_note,
         )
 
@@ -428,7 +412,7 @@ class PhoneBookApp:
         suggestions = self.phonebook.search_by_name_partial(name)
         if suggestions:
             print(f"\n  ℹ️  '{name}' tidak ditemukan persis. "
-                  f"Kontak yang mirip:")
+                f"Kontak yang mirip:")
             self.phonebook._print_table(suggestions)
             exact = input("\n  Masukkan nama lengkap (atau Enter untuk batal): ").strip()
             if not exact:
