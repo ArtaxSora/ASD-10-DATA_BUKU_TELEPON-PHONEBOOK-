@@ -94,6 +94,39 @@ class FileHandler:
             print(f"  ✅ Data berhasil diekspor ke '{export_path}'")
         return ok
 
+    # ── BACKUP ──────────────────────────────────────────────
+    def backup(self) -> str | None:
+        """
+        Buat salinan backup dengan timestamp.
+        Contoh nama: phonebook_backup_20250101_120000.csv
+        Return path backup atau None jika gagal.
+        """
+        if not os.path.exists(self.filename):
+            print("  [WARNING] File asli tidak ditemukan, tidak ada yang di-backup.")
+            return None
+        ts          = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base, ext   = os.path.splitext(self.filename)
+        backup_path = f"{base}_backup_{ts}{ext}"
+        try:
+            shutil.copy2(self.filename, backup_path)
+            print(f"  ✅ Backup disimpan ke '{backup_path}'")
+            return backup_path
+        except Exception as exc:
+            print(f"  [ERROR] Backup gagal: {exc}")
+            return None
+
+    # ── INFO ─────────────────────────────────────────────────
+    def file_info(self) -> dict:
+        """Kembalikan info file (path, ukuran, waktu modifikasi)."""
+        if not os.path.exists(self.filename):
+            return {"exists": False, "path": self.filename}
+        stat = os.stat(self.filename)
+        return {
+            "exists":   True,
+            "path":     os.path.abspath(self.filename),
+            "size_kb":  round(stat.st_size / 1024, 2),
+            "modified": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
 # ── Unit-test sederhana ─────────────────────────────────────
 # if __name__ == "__main__":
