@@ -78,7 +78,7 @@ class PhoneBookApp:
 
     def __init__(self, csv_file: str = "phonebook.csv"):
         self.phonebook    = LinkedList()
-        self.history      = Stack(max_size=10)
+        self.history      = Stack(max_size=20)
         self.file_handler = FileHandler(filename=csv_file)
         self._load_on_startup()
 
@@ -350,15 +350,60 @@ class PhoneBookApp:
     #  Anggota 3
     # ────────────────────────────────────────────────────────
     def handle_history(self) -> None:
-        _section(f"📜  RIWAYAT OPERASI  ({len(self.history)}/10 slot terisi)")
         items = self.history.to_list()
+        total = len(items)
+        
         if not items:
+            _section("📜  RIWAYAT OPERASI")
             print("  [Belum ada riwayat operasi]")
-        else:
-            for i, item in enumerate(items, 1):
-                mark = " ← terbaru" if i == 1 else ""
-                print(f"  {i:2}. {item}{mark}")
-        _pause()
+            _pause()
+            return
+        
+        page = 0
+        items_per_page = 5
+        total_pages = (total + items_per_page - 1) // items_per_page
+        
+        while True:
+            _clear()
+            _banner()
+            _section(f"📜  RIWAYAT OPERASI  ({total}/20 slot terisi)")
+            
+            # Hitung range item untuk halaman saat ini
+            start_idx = page * items_per_page
+            end_idx = min((page + 1) * items_per_page, total)
+            
+            print(f"  📄 Halaman {page + 1}/{total_pages}\n")
+            
+            # Tampilkan 5 item
+            for i in range(start_idx, end_idx):
+                display_num = i + 1
+                mark = " ← terbaru" if i == 0 else ""
+                print(f"  {display_num:2}. {items[i]}{mark}")
+            
+            print()
+            print(_divider("─"))
+            
+            # Menu navigasi
+            menu_options = []
+            if page > 0:
+                menu_options.append("P) Sebelumnya")
+            if page < total_pages - 1:
+                menu_options.append("N) Selanjutnya")
+            menu_options.append("K) Kembali ke Menu")
+            
+            print("  " + "  |  ".join(menu_options))
+            
+            choice = input("\n  Pilih [P/N/K]: ").strip().upper()
+            
+            if choice == "K":
+                break
+            elif choice == "P" and page > 0:
+                page -= 1
+            elif choice == "N" and page < total_pages - 1:
+                page += 1
+            else:
+                print("  ❌ Pilihan tidak valid.")
+                input("  ↵  Tekan Enter...")
 
     # ────────────────────────────────────────────────────────
     #  8. BACKUP / EKSPOR
