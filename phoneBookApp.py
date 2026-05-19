@@ -185,8 +185,8 @@ class PhoneBookApp:
     def handle_search(self) -> None:
         _section("🔍  CARI KONTAK")
         print("  Metode pencarian:")
-        print("  1. Nama  → Binary Search  O(log n)")
-        print("  2. Nomor → Linear Search  O(n)")
+        print("  1. Nama    → Binary Search  O(log n)")
+        print("  2. Catatan → Linear Search  O(n)")
         method = input("  Pilih [1/2]: ").strip()
 
         if method == "1":
@@ -214,20 +214,19 @@ class PhoneBookApp:
                     self._log(f"SEARCH  → nama='{keyword}' (tidak ditemukan)")
 
         elif method == "2":
-            raw = input("  Masukkan nomor telepon: ").strip()
-            ok, phone = Validator.validate_phone(raw)
-            if not ok:
-                print(f"  ❌ {phone}")
+            keyword = input("  Masukkan catatan: ").strip()
+            if not keyword:
+                print("  ❌ Keyword catatan tidak boleh kosong.")
                 _pause(); return
 
-            found = self.phonebook.search_by_phone(phone)
+            found = self.phonebook.search_by_note(keyword)
             if found:
-                print(f"\n  ✅ Ditemukan (Linear Search):")
-                self.phonebook._print_table([found])
-                self._log(f"SEARCH  → nomor='{phone}' (ditemukan)")
+                print(f"\n  ✅ Ditemukan {len(found)} kontak dengan catatan yang sesuai:")
+                self.phonebook._print_table(found)
+                self._log(f"SEARCH  → catatan='{keyword}' ({len(found)} ditemukan)")
             else:
-                print(f"  ❌ Nomor '{phone}' tidak ditemukan.")
-                self._log(f"SEARCH  → nomor='{phone}' (tidak ditemukan)")
+                print(f"  ❌ Tidak ada kontak dengan catatan '{keyword}'.")
+                self._log(f"SEARCH  → catatan='{keyword}' (tidak ditemukan)")
         else:
             print("  ❌ Pilihan tidak valid.")
 

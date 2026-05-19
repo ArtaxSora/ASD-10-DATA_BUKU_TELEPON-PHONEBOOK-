@@ -157,6 +157,22 @@ class LinkedList:
             cur = cur.next
         return None
 
+    # ── SEARCH: Linear Search (catatan) ───────────────────────
+    def search_by_note(self, keyword: str) -> list[Contact]:
+        """
+        Linear Search pencarian di catatan (case-insensitive, partial match).
+        Berguna untuk menemukan kontak berdasarkan deskripsi.
+        Kompleksitas: O(n).
+        """
+        results = []
+        kw      = keyword.strip().lower()
+        cur     = self.head
+        while cur:
+            if kw in cur.note.lower():
+                results.append(cur)
+            cur = cur.next
+        return results
+
     # ── UPDATE ───────────────────────────────────────────────
     def update(
         self,
