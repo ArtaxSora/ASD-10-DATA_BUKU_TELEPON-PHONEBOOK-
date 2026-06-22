@@ -1,6 +1,6 @@
 # ============================================================
 # validator.py
-# Hari 1 – Anggota 2
+# kerjaan Arya
 # Tugas: Validasi & sanitasi semua input pengguna
 # ============================================================
 

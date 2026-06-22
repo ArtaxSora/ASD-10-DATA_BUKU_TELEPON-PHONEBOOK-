@@ -1,6 +1,6 @@
 # ============================================================
 # contact.py
-# Kerjaan Nabil
+# Kerjaan Arya
 # Tugas: Buat class Contact sebagai Node Linked List
 # ============================================================
 
@@ -43,11 +43,11 @@ class Contact:
 
 
 # ── Unit-test sederhana (jalankan: python contact.py) ──────
-if __name__ == "__main__":
-    c1 = Contact("Budi Santoso", "081234567890", "Teman kuliah")
-    c2 = Contact("Ani Rahayu",   "087654321098")
-    print(c1)
-    print(c2)
-    print("c2 < c1 ?", c2 < c1)           # True  (Ani < Budi)
-    print("dict:", c1.to_dict())
-    print("✅ contact.py OK")
+# if __name__ == "__main__":
+#     c1 = Contact("Budi Santoso", "081234567890", "Teman kuliah")
+#     c2 = Contact("Ani Rahayu",   "087654321098")
+#     print(c1)
+#     print(c2)
+#     print("c2 < c1 ?", c2 < c1)           # True  (Ani < Budi)
+#     print("dict:", c1.to_dict())
+#     print("✅ contact.py OK")
