@@ -238,8 +238,13 @@ class LinkedList:
         """Cetak semua kontak dalam format tabel."""
         self._print_table(self.get_all())
 
-    def _print_table(self, contacts: list[Contact]) -> None:
-        """Cetak list kontak sebagai tabel rata kiri."""
+    def _print_table(self, contacts: list[Contact], start_num: int = 1) -> None:
+        """Cetak list kontak sebagai tabel rata kiri.
+        
+        Args:
+            contacts: List kontak yang akan ditampilkan
+            start_num: Nomor urut awal (default: 1). Berguna untuk pagination.
+        """
         if not contacts:
             print("  [Tidak ada kontak]")
             return
@@ -258,7 +263,7 @@ class LinkedList:
         print(header)
         print("  " + "─" * total)
 
-        for i, c in enumerate(contacts, 1):
+        for i, c in enumerate(contacts, start_num):
             name  = (c.name[:W_NAME-1]  + "…") if len(c.name)  > W_NAME  else c.name
             phone = (c.phone[:W_PHONE-1] + "…") if len(c.phone) > W_PHONE else c.phone
             

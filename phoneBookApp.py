@@ -33,7 +33,7 @@ def _divider(char: str = "─", width: int = 48) -> str:
 def _banner() -> None:
     print()
     print("  ╔══════════════════════════════════════════════╗")
-    print("  ║       📒  PHONEBOOK CLI  ─  Kelompok 10     ║")
+    print("  ║       📒  PHONEBOOK CLI  ─  Kelompok 10      ║")
     print("  ║     Sistem Manajemen Buku Telepon Terminal   ║")
     print("  ╚══════════════════════════════════════════════╝")
 
@@ -41,16 +41,16 @@ def _banner() -> None:
 def _menu() -> None:
     print()
     print("  ╔══════════════════════════════════════════════╗")
-    print("  ║            📋  MENU UTAMA                   ║")
+    print("  ║            📋  MENU UTAMA                    ║")
     print("  ╠══════════════════════════════════════════════╣")
-    print("  ║  1. 📝  Tambah Kontak Baru                  ║")
-    print("  ║  2. 📋  Tampilkan Semua Kontak              ║")
-    print("  ║  3. 🔍  Cari Kontak                         ║")
-    print("  ║  4. ✏️   Edit Kontak                         ║")
-    print("  ║  5. 🗑️   Hapus Kontak                        ║")
-    print("  ║  6. 📊  Urutkan & Tampilkan                 ║")
-    print("  ║  7. 📜  Riwayat Operasi (History)           ║")
-    print("  ║  8. 💾  Backup / Ekspor Data                ║")
+    print("  ║  1. 📝  Tambah Kontak Baru                   ║")
+    print("  ║  2. 📋  Tampilkan Semua Kontak               ║")
+    print("  ║  3. 🔍  Cari Kontak                          ║")
+    print("  ║  4. ✏️  Edit Kontak                           ║")
+    print("  ║  5. 🗑️  Hapus Kontak                          ║")
+    print("  ║  6. 📊  Urutkan & Tampilkan                  ║")
+    print("  ║  7. 📜  Riwayat Operasi (History)            ║")
+    print("  ║  8. 💾  Backup / Ekspor Data                 ║")
     print("  ║  9. 🚪  Keluar                               ║")
     print("  ╚══════════════════════════════════════════════╝")
 
@@ -174,9 +174,7 @@ class PhoneBookApp:
     #  Anggota 1
     # ────────────────────────────────────────────────────────
     def handle_view(self) -> None:
-        _section(f"📋  SEMUA KONTAK  ({len(self.phonebook)} total)")
-        self.phonebook.display_all()
-        _pause()
+        self._display_contacts_paginated()
 
     # ────────────────────────────────────────────────────────
     #  3. CARI KONTAK
@@ -270,8 +268,9 @@ class PhoneBookApp:
         new_note_raw = input(f"  Catatan    [{contact.note}]: ").strip()
         new_note: str | None = Validator.sanitize(new_note_raw) if new_note_raw else None
 
+        # Gunakan contact.name (nama yang sudah diverifikasi) bukan input awal
         success, msg = self.phonebook.update(
-            name,
+            contact.name,
             new_name  = new_name,
             new_phone = new_phone,
             new_note  = new_note,
@@ -279,8 +278,8 @@ class PhoneBookApp:
 
         if success:
             self._save()
-            final = new_name if new_name else name
-            self._log(f"EDIT    → '{name}' ⟶ '{final}'")
+            final = new_name if new_name else contact.name
+            self._log(f"EDIT    → '{contact.name}' ⟶ '{final}'")
             print(f"\n  ✅ {msg}")
         else:
             print(f"\n  ❌ {msg}")
@@ -304,6 +303,7 @@ class PhoneBookApp:
 
         confirm = input("\n  ⚠️  Yakin ingin menghapus? [y/N]: ").strip().lower()
         if confirm == "y":
+            # Gunakan contact.name (nama yang sudah diverifikasi)
             deleted = self.phonebook.delete(contact.name)
             if deleted:
                 self._save()
@@ -467,6 +467,71 @@ class PhoneBookApp:
 
         print(f"  ❌ Kontak '{name}' tidak ditemukan.")
         return None
+
+    # ────────────────────────────────────────────────────────
+    #  HELPER PRIVAT: Tampilkan kontak dengan pagination
+    # ────────────────────────────────────────────────────────
+    def _display_contacts_paginated(self) -> None:
+        """
+        Tampilkan semua kontak dengan pagination (10 data per halaman).
+        Mendukung navigasi next, prev, dan kembali ke menu.
+        """
+        contacts = self.phonebook.get_all()
+        total    = len(contacts)
+        
+        if not contacts:
+            _section("📋  SEMUA KONTAK")
+            print("  [Tidak ada kontak]")
+            _pause()
+            return
+        
+        items_per_page = 10
+        total_pages    = (total + items_per_page - 1) // items_per_page
+        page           = 0
+        
+        while True:
+            _clear()
+            _banner()
+            _section(f"📋  SEMUA KONTAK  ({total} total)")
+            
+            # Hitung range kontak untuk halaman saat ini
+            start_idx = page * items_per_page
+            end_idx   = min((page + 1) * items_per_page, total)
+            page_contacts = contacts[start_idx:end_idx]
+            
+            print(f"  📄 Halaman {page + 1}/{total_pages}  "
+                  f"[Menampilkan {start_idx + 1}–{end_idx} dari {total} kontak]\n")
+            
+            # Tampilkan tabel kontak untuk halaman ini
+            # Nomor urut dimulai dari: (page * items_per_page) + 1
+            start_num = (page * items_per_page) + 1
+            self.phonebook._print_table(page_contacts, start_num=start_num)
+            
+            print()
+            print(_divider("─"))
+            
+            # Menu navigasi
+            menu_options = []
+            if page > 0:
+                menu_options.append("P) Sebelumnya")
+            if page < total_pages - 1:
+                menu_options.append("N) Selanjutnya")
+            menu_options.append("K) Kembali")
+            
+            print("  " + "  |  ".join(menu_options))
+            
+            choice = input("\n  Pilih [P/N/K]: ").strip().upper()
+            
+            if choice == "K":
+                break
+            elif choice == "P" and page > 0:
+                page -= 1
+            elif choice == "N" and page < total_pages - 1:
+                page += 1
+            else:
+                if choice not in ["P", "N", "K"]:
+                    print("  ❌ Pilihan tidak valid.")
+                input("  ↵  Tekan Enter...")
 
 
 # ══════════════════════════════════════════════════════════════
